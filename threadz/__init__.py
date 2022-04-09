@@ -5,11 +5,9 @@ from typing import (
     Any, Callable, Dict, Iterable, Tuple, TypeVar, Union
 )
 
-T = TypeVar("T")
+__all__ = ("gather", "run", "threadify")
 
-__all__ = (
-    "gather", "run", "threadify"
-)
+T = TypeVar("T")
 
 
 def threadify(func: Callable[..., Any]) -> Callable[..., None]:

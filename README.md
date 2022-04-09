@@ -1,4 +1,4 @@
-# Threadz
+# threadz 💨
 ## A cute Python library for better threading management
 
 ## Installation
