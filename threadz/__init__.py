@@ -2,15 +2,18 @@ import threading
 import functools
 
 from typing import (
-    Any, Dict, Mapping, Optional, ParamSpec, Tuple,
-    Union, TypeVar,
-    Callable, Iterable,
+    Tuple, Dict, Mapping, Any, Iterable,
+    Optional, Union, Callable,
+    TypeVar, ParamSpec
 )
 
 __all__ = ("gather", "run", "threadify")
 
 R = TypeVar("R")
 P = ParamSpec("P")
+
+Args = Tuple
+Kwargs = Mapping[str, Any]
 
 
 def threadify(func: Callable[P, Any]) -> Callable[P, None]:
@@ -27,7 +30,7 @@ def threadify(func: Callable[P, Any]) -> Callable[P, None]:
 
 
 def run(
-    tasks: Iterable[Tuple[Callable, Tuple, Mapping[str, Any]]],
+    tasks: Iterable[Tuple[Callable, Args, Kwargs]],
     concurrency: Optional[int] = None
 ) -> None:
     """ Run a list of tasks with concurrency. """
@@ -35,14 +38,14 @@ def run(
 
     def _run_task(
         func: Callable,
-        args: Tuple,
-        kwargs: Mapping[str, Any]
+        args: Args,
+        kwargs: Kwargs
     ) -> None:
         """ Run a task and store the result. """
         nonlocal running
 
         running += 1
-        func(*args)
+        func(*args, **kwargs)
         running -= 1
 
     for task in tasks:
@@ -69,10 +72,7 @@ def gather(
     results: Dict[int, Union[R, Exception]] = {}
 
     def _run_task(
-        idx: int,
-        func: Callable[P, R],
-        args: Tuple,
-        kwargs: Mapping[str, Any]
+        idx: int, func: Callable[P, R], args: Args, kwargs: Kwargs
     ) -> None:
         """ Run a task and store the result. """
         nonlocal running, results
