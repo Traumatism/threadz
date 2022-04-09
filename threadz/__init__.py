@@ -40,7 +40,7 @@ def run(
         func: Callable,
         args: Args,
         kwargs: Kwargs
-    ) -> None:
+    ):
         """ Run a task and store the result. """
         nonlocal running
 
