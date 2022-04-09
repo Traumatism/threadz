@@ -2,9 +2,9 @@
 ## A cute Python library for better threading management
 
 ## Installation
-```bash
 
-```
+- Clone the repo
+- Run `python setup.py install`
 
 ## Usage
 
