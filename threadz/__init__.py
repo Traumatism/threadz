@@ -59,7 +59,7 @@ def run(
 
 
 def gather(
-    tasks: Iterable[Tuple[Callable[P, R], Tuple, Mapping[str, Any]]],
+    tasks: Iterable[Tuple[Callable[P, R], Args, Kwargs]],
     concurrency: Optional[int] = None
 ) -> Dict[int, Union[R, Exception]]:
     """
@@ -72,9 +72,11 @@ def gather(
     results: Dict[int, Union[R, Exception]] = {}
 
     def _run_task(
-        idx: int, func: Callable[P, R], args: Args, kwargs: Kwargs
-    ) -> None:
-        """ Run a task and store the result. """
+        idx: int,
+        func: Callable[P, R],
+        args: Args,
+        kwargs: Kwargs
+    ):
         nonlocal running, results
 
         running += 1
