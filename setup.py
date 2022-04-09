@@ -1,5 +1,5 @@
 """
-    Setup file for dropper.
+    Setup file for threadz.
     Use setup.cfg to configure your project.
 
     This file was generated with PyScaffold 4.2.1.

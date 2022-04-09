@@ -3,7 +3,7 @@
 
 ## Installation
 ```bash
-idk yet
+
 ```
 
 ## Usage
