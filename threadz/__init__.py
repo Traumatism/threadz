@@ -10,18 +10,18 @@ from typing import (
 __all__ = ("gather", "run", "threadify")
 
 T_Return = TypeVar("T_Return")
-
 T_Params = ParamSpec("T_Params")
 
 
-def threadify(func: Callable[T_Params, Any]) -> Callable[..., None]:
+def threadify(func: Callable[T_Params, Any]) -> Callable[T_Params, None]:
     """ Decorator to make a function run in a thread. """
 
     @functools.wraps(func)
     def wrapper(*args: T_Params.args, **kwargs: T_Params.kwargs) -> None:
         """ Wrapper function. """
-        partial = functools.partial(func, *args, **kwargs)
-        threading.Thread(target=partial).start()
+        threading.Thread(
+            target=functools.partial(func, *args, **kwargs)
+        ).start()
 
     return wrapper
 
@@ -62,15 +62,15 @@ def gather(
     The return value is a dictionary mapping task index to the results.
     """
 
-    results: Dict[int, Union[T_Return, Exception]] = {}
     running = 0
+    results: Dict[int, Union[T_Return, Exception]] = {}
 
     @threadify
     def _run_task(
         idx: int, func: Callable[T_Params, T_Return], args: Tuple
     ) -> None:
         """ Run a task and store the result. """
-        nonlocal results, running
+        nonlocal running, results
 
         running += 1
 

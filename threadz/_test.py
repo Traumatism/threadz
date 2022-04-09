@@ -15,7 +15,7 @@ def threadify_test():
     f = threadify(huge_time_function) if TEST else huge_time_function
 
     for _ in range(10):
-        f()  # type: ignore
+        f(1)
 
 
 def gather_test():
