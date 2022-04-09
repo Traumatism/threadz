@@ -33,7 +33,6 @@ def run(
     """ Run a list of tasks with concurrency. """
     running = 0
 
-    @threadify
     def _run_task(func: Callable, args: Tuple) -> None:
         """ Run a task and store the result. """
         nonlocal running
@@ -42,11 +41,11 @@ def run(
         func(*args)
         running -= 1
 
-    for func, args in tasks:
+    for task in tasks:
         while running >= (concurrency or running - 1):
             pass
 
-        _run_task(func, args)
+        threadify(_run_task)(*task)
 
     while running > 0:
         pass
@@ -65,7 +64,6 @@ def gather(
     running = 0
     results: Dict[int, Union[T_Return, Exception]] = {}
 
-    @threadify
     def _run_task(
         idx: int, func: Callable[T_Params, T_Return], args: Tuple
     ) -> None:
@@ -85,7 +83,7 @@ def gather(
         while running >= (concurrency or running - 1):
             pass
 
-        _run_task(idx, *task)
+        threadify(_run_task)(idx, *task)
 
     while running > 0:
         pass
