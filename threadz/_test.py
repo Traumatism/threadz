@@ -3,9 +3,9 @@ import time
 from . import threadify, gather
 
 
-def huge_time_function():
+def huge_time_function(i: int) -> None:
     time.sleep(1)
-    print("done!")
+    print("done! (%d)" % i)
 
 
 def threadify_test():
@@ -29,5 +29,5 @@ def gather_test():
 
 
 if __name__ == "__main__":
-    threadify_test()
+    # threadify_test()
     gather_test()
