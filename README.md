@@ -65,4 +65,11 @@ function() # new thread will be created
 function() # new thread will be created
 function() # new thread will be created
 
+""" ... or ... """
+
+def function(args):
+    ...
+
+threadz.threadify(function)(args)
+
 ```
