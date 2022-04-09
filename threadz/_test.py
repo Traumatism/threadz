@@ -3,9 +3,10 @@ import time
 from . import threadify, gather
 
 
-def huge_time_function(i: int) -> None:
+def huge_time_function(i: int) -> int:
     time.sleep(1)
     print("done! (%d)" % i)
+    return i**2
 
 
 def threadify_test():

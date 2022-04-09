@@ -2,23 +2,26 @@ import threading
 import functools
 
 from typing import (
-    Any, Dict, Optional, Tuple,
+    Any, Dict, Optional, ParamSpec, Tuple,
     Union, TypeVar,
-    Callable, Iterable
+    Callable, Iterable,
 )
 
 __all__ = ("gather", "run", "threadify")
 
-T = TypeVar("T")
+T_Return = TypeVar("T_Return")
+
+T_Params = ParamSpec("T_Params")
 
 
-def threadify(func: Callable[..., Any]) -> Callable[..., None]:
+def threadify(func: Callable[T_Params, Any]) -> Callable[..., None]:
     """ Decorator to make a function run in a thread. """
 
     @functools.wraps(func)
-    def wrapper(*args) -> None:
+    def wrapper(*args: T_Params.args, **kwargs: T_Params.kwargs) -> None:
         """ Wrapper function. """
-        threading.Thread(target=func, args=args).start()
+        partial = functools.partial(func, *args, **kwargs)
+        threading.Thread(target=partial).start()
 
     return wrapper
 
@@ -50,20 +53,22 @@ def run(
 
 
 def gather(
-    tasks: Iterable[Tuple[Callable[..., T], Tuple[Any]]],
+    tasks: Iterable[Tuple[Callable[..., T_Return], Tuple[Any]]],
     concurrency: Optional[int] = None
-) -> Dict[int, Union[T, Exception]]:
+) -> Dict[int, Union[T_Return, Exception]]:
     """
     Run a list of tasks with concurrency and return the results.
 
     The return value is a dictionary mapping task index to the results.
     """
 
-    results: Dict[int, Union[T, Exception]] = {}
+    results: Dict[int, Union[T_Return, Exception]] = {}
     running = 0
 
     @threadify
-    def _run_task(idx: int, func: Callable[..., T], args: Tuple) -> None:
+    def _run_task(
+        idx: int, func: Callable[T_Params, T_Return], args: Tuple
+    ) -> None:
         """ Run a task and store the result. """
         nonlocal results, running
 
