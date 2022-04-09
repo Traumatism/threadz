@@ -21,13 +21,14 @@ def huge_calcul(n: int) -> int:
 List of tasks.
 
 Task must be a tuple containing the target
-function as the first element, and a tuple
-of arguments as the second element.
+function as the first element, a tuple of
+arguments as the second element (args), and
+a mapping of string keys to values as the
+third element (kwargs).
 """
 
 tasks = [
-    (huge_calcul, (i,)) 
-    for i in range(50)
+    (huge_calcul, (i,), {}) for i in range(50)
 ]
 
 """

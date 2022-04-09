@@ -2,22 +2,22 @@ import threading
 import functools
 
 from typing import (
-    Any, Dict, Optional, ParamSpec, Tuple,
+    Any, Dict, Mapping, Optional, ParamSpec, Tuple,
     Union, TypeVar,
     Callable, Iterable,
 )
 
 __all__ = ("gather", "run", "threadify")
 
-T_Return = TypeVar("T_Return")
-T_Params = ParamSpec("T_Params")
+R = TypeVar("R")
+P = ParamSpec("P")
 
 
-def threadify(func: Callable[T_Params, Any]) -> Callable[T_Params, None]:
+def threadify(func: Callable[P, Any]) -> Callable[P, None]:
     """ Decorator to make a function run in a thread. """
 
     @functools.wraps(func)
-    def wrapper(*args: T_Params.args, **kwargs: T_Params.kwargs) -> None:
+    def wrapper(*args: P.args, **kwargs: P.kwargs) -> None:
         """ Wrapper function. """
         threading.Thread(
             target=functools.partial(func, *args, **kwargs)
@@ -27,13 +27,17 @@ def threadify(func: Callable[T_Params, Any]) -> Callable[T_Params, None]:
 
 
 def run(
-    tasks: Iterable[Tuple[Callable, Tuple[Any]]],
+    tasks: Iterable[Tuple[Callable, Tuple, Mapping[str, Any]]],
     concurrency: Optional[int] = None
 ) -> None:
     """ Run a list of tasks with concurrency. """
     running = 0
 
-    def _run_task(func: Callable, args: Tuple) -> None:
+    def _run_task(
+        func: Callable,
+        args: Tuple,
+        kwargs: Mapping[str, Any]
+    ) -> None:
         """ Run a task and store the result. """
         nonlocal running
 
@@ -52,9 +56,9 @@ def run(
 
 
 def gather(
-    tasks: Iterable[Tuple[Callable[T_Params, T_Return], Tuple[Any]]],
+    tasks: Iterable[Tuple[Callable[P, R], Tuple, Mapping[str, Any]]],
     concurrency: Optional[int] = None
-) -> Dict[int, Union[T_Return, Exception]]:
+) -> Dict[int, Union[R, Exception]]:
     """
     Run a list of tasks with concurrency and return the results.
 
@@ -62,10 +66,13 @@ def gather(
     """
 
     running = 0
-    results: Dict[int, Union[T_Return, Exception]] = {}
+    results: Dict[int, Union[R, Exception]] = {}
 
     def _run_task(
-        idx: int, func: Callable[T_Params, T_Return], args: Tuple
+        idx: int,
+        func: Callable[P, R],
+        args: Tuple,
+        kwargs: Mapping[str, Any]
     ) -> None:
         """ Run a task and store the result. """
         nonlocal running, results
@@ -73,7 +80,7 @@ def gather(
         running += 1
 
         try:
-            results[idx] = func(*args)
+            results[idx] = func(*args, **kwargs)
         except Exception as e:
             results[idx] = e
 

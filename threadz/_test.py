@@ -10,17 +10,14 @@ def huge_time_function(i: int) -> int:
 
 
 def threadify_test():
-    TEST = True
 
-    f = threadify(huge_time_function) if TEST else huge_time_function
-
-    for _ in range(10):
-        f(1)
+    for i in range(10):
+        threadify(huge_time_function)(i=i)
 
 
 def gather_test():
     tasks = [
-        (huge_time_function, (i,))
+        (huge_time_function, (i,), {})
         for i in range(50)
     ]
 
@@ -30,5 +27,5 @@ def gather_test():
 
 
 if __name__ == "__main__":
-    # threadify_test()
-    gather_test()
+    threadify_test()
+    # gather_test()
