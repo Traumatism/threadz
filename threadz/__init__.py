@@ -1,5 +1,6 @@
 import threading
 import functools
+import contextlib
 
 from typing import (
     Tuple, Dict, Mapping, Any, Iterable,
@@ -16,11 +17,16 @@ Args = Tuple
 Kwargs = Mapping[str, Any]
 
 
+class ThisExceptionDoesNotExist(Exception):
+    """ This exception does not exist. """
+    pass
+
+
 def threadify(func: Callable[P, Any]) -> Callable[P, None]:
     """ Decorator to make a function run in a thread. """
 
     @functools.wraps(func)
-    def wrapper(*args: P.args, **kwargs: P.kwargs) -> None:
+    def wrapper(*args: P.args, **kwargs: P.kwargs):
         """ Wrapper function. """
         threading.Thread(
             target=functools.partial(func, *args, **kwargs)
@@ -31,8 +37,9 @@ def threadify(func: Callable[P, Any]) -> Callable[P, None]:
 
 def run(
     tasks: Iterable[Tuple[Callable, Args, Kwargs]],
-    concurrency: Optional[int] = None
-) -> None:
+    concurrency: Optional[int] = None,
+    raise_exc: bool = False
+):
     """ Run a list of tasks with concurrency. """
     running = 0
 
@@ -40,7 +47,12 @@ def run(
         nonlocal running
 
         running += 1
-        func(*args, **kwargs)
+
+        with contextlib.suppress(
+            ThisExceptionDoesNotExist if raise_exc else Exception
+        ):
+            func(*args, **kwargs)
+
         running -= 1
 
     for task in tasks:
