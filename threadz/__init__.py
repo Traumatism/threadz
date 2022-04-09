@@ -2,7 +2,9 @@ import threading
 import functools
 
 from typing import (
-    Any, Callable, Dict, Iterable, Tuple, TypeVar, Union
+    Any, Dict, Optional, Tuple,
+    Union, TypeVar,
+    Callable, Iterable
 )
 
 __all__ = ("gather", "run", "threadify")
@@ -22,7 +24,8 @@ def threadify(func: Callable[..., Any]) -> Callable[..., None]:
 
 
 def run(
-    tasks: Iterable[Tuple[Callable, Tuple[Any]]], concurrency: int
+    tasks: Iterable[Tuple[Callable, Tuple[Any]]],
+    concurrency: Optional[int] = None
 ) -> None:
     """ Run a list of tasks with concurrency. """
     running = 0
@@ -37,7 +40,7 @@ def run(
         running -= 1
 
     for func, args in tasks:
-        while running >= concurrency:
+        while running >= (concurrency or running - 1):
             pass
 
         _run_task(func, args)
@@ -48,7 +51,7 @@ def run(
 
 def gather(
     tasks: Iterable[Tuple[Callable[..., T], Tuple[Any]]],
-    concurrency: int
+    concurrency: Optional[int] = None
 ) -> Dict[int, Union[T, Exception]]:
     """
     Run a list of tasks with concurrency and return the results.
@@ -74,7 +77,7 @@ def gather(
         running -= 1
 
     for idx, task in enumerate(tasks):
-        while running >= concurrency:
+        while running >= (concurrency or running - 1):
             pass
 
         _run_task(idx, *task)
