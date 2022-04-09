@@ -53,7 +53,7 @@ def run(
 
 
 def gather(
-    tasks: Iterable[Tuple[Callable[..., T_Return], Tuple[Any]]],
+    tasks: Iterable[Tuple[Callable[T_Params, T_Return], Tuple[Any]]],
     concurrency: Optional[int] = None
 ) -> Dict[int, Union[T_Return, Exception]]:
     """
