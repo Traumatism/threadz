@@ -36,7 +36,7 @@ def run(
         func(*args)
         running -= 1
 
-    for (func, args) in tasks:
+    for func, args in tasks:
         while running >= concurrency:
             pass
 
