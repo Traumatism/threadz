@@ -42,7 +42,12 @@ Same as the example above, but we gather what the
 function returns in a dictionnary.
 
 The return value is a dictionary mapping task index 
-to the results.
+to the results. If the function raises an exception,
+the task index value is set to the exception.
+
+This is also MyPy friendly, which means that if the
+function must return an integer value, gather()
+will return a dictionary with integers as values.
 """
 
 results = threadz.gather(tasks, concurrency=5)
