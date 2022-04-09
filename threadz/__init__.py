@@ -73,11 +73,11 @@ def gather(
 
         running -= 1
 
-    for idx, (func, args) in enumerate(tasks):
+    for idx, task in enumerate(tasks):
         while running >= concurrency:
             pass
 
-        _run_task(idx, func, args)
+        _run_task(idx, *task)
 
     while running > 0:
         pass
