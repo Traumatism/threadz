@@ -56,7 +56,7 @@ for r in results:
     print(r)
 
 
-""" Last usage above... """
+""" Add threading to functions """
 @threadz.threadify
 def function():
     ...
