@@ -48,7 +48,8 @@ the task index value is set to the exception.
 
 This is also typing friendly, which means that if the
 function must return an integer value, gather()
-will return a dictionary with integers as values.
+will return a dictionary with integers as values and
+MyPy will be able to predict that.
 """
 
 results = threadz.gather(tasks, concurrency=5)
