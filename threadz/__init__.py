@@ -13,7 +13,7 @@ __all__ = ("gather", "run", "threadify")
 R = TypeVar("R")
 P = ParamSpec("P")
 
-Args = Tuple
+Args = Tuple[Any]
 Kwargs = Mapping[str, Any]
 
 
@@ -27,10 +27,8 @@ def threadify(func: Callable[P, Any]) -> Callable[P, None]:
 
     @functools.wraps(func)
     def wrapper(*args: P.args, **kwargs: P.kwargs):
-        """ Wrapper function. """
-        threading.Thread(
-            target=functools.partial(func, *args, **kwargs)
-        ).start()
+        partial = functools.partial(func, *args, **kwargs)
+        threading.Thread(target=partial).start()
 
     return wrapper
 
@@ -99,4 +97,4 @@ def gather(
     while running > 0:
         pass
 
-    return dict(sorted(results.items(), key=lambda x: x[0]))
+    return dict(sorted(results.items()))
