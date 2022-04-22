@@ -1,100 +1,22 @@
-import threading
-import functools
-import contextlib
+from .run import run
+from .gather import gather
+from .threadify import threadify
 
 from typing import (
-    Tuple, Dict, Mapping, Any, Iterable,
-    Optional, Union, Callable,
-    TypeVar, ParamSpec
+    Callable, TypeVar, ParamSpec,
+    Optional, Tuple, Dict, Any
 )
 
-__all__ = ("gather", "run", "threadify")
+__all__ = ("gather", "run", "threadify", "create_task")
 
 R = TypeVar("R")
 P = ParamSpec("P")
 
-Args = Tuple[Any]
-Kwargs = Mapping[str, Any]
 
-
-class ThisExceptionDoesNotExist(Exception):
-    """ This exception does not exist. """
-    pass
-
-
-def threadify(func: Callable[P, Any]) -> Callable[P, None]:
-    """ Decorator to make a function run in a thread. """
-
-    @functools.wraps(func)
-    def wrapper(*args: P.args, **kwargs: P.kwargs):
-        partial = functools.partial(func, *args, **kwargs)
-        threading.Thread(target=partial).start()
-
-    return wrapper
-
-
-def run(
-    tasks: Iterable[Tuple[Callable, Args, Kwargs]],
-    concurrency: Optional[int] = None,
-    raise_exc: bool = False
-):
-    """ Run a list of tasks with concurrency. """
-    running = 0
-
-    def _run_task(func: Callable, args: Args, kwargs: Kwargs):
-        nonlocal running
-
-        running += 1
-
-        with contextlib.suppress(
-            ThisExceptionDoesNotExist if raise_exc else Exception
-        ):
-            func(*args, **kwargs)
-
-        running -= 1
-
-    for task in tasks:
-        while concurrency and (running >= concurrency):
-            pass
-
-        threadify(_run_task)(*task)
-
-    while running > 0:
-        pass
-
-
-def gather(
-    tasks: Iterable[Tuple[Callable[P, R], Args, Kwargs]],
-    concurrency: Optional[int] = None
-) -> Dict[int, Union[R, Exception]]:
-    """
-    Run a list of tasks with concurrency and return the results.
-
-    The return value is a dictionary mapping task index to the results.
-    """
-
-    running = 0
-    results: Dict[int, Union[R, Exception]] = {}
-
-    def _run_task(idx: int, func: Callable[P, R], args: Args, kwargs: Kwargs):
-        nonlocal running, results
-
-        running += 1
-
-        try:
-            results[idx] = func(*args, **kwargs)
-        except Exception as e:
-            results[idx] = e
-
-        running -= 1
-
-    for idx, task in enumerate(tasks):
-        while concurrency and (running >= concurrency):
-            pass
-
-        threadify(_run_task)(idx, *task)
-
-    while running > 0:
-        pass
-
-    return dict(sorted(results.items()))
+def create_task(
+    func: Callable[P, R],
+    args: Optional[Tuple] = None,
+    kwargs: Optional[Dict[str, Any]] = None
+) -> Tuple[Callable[P, R], Tuple, Dict[str, Any]]:
+    """ Create a task. """
+    return func, args or tuple(), kwargs or dict()

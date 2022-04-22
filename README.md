@@ -28,7 +28,8 @@ third element (kwargs).
 """
 
 tasks = [
-    (huge_calcul, (i,), {}) for i in range(50)
+    threadz.create_task(huge_calcul, args=(i, ))
+    for i in range(50)
 ]
 
 """
