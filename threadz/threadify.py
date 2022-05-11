@@ -11,7 +11,7 @@ def threadify(func: Callable[P, Any]) -> Callable[P, None]:
 
     @functools.wraps(func)
     def wrapper(*args: P.args, **kwargs: P.kwargs):
-        threading.Thread(
+        return threading.Thread(
             None, functools.partial(func, *args, **kwargs)
         ).start()
 
