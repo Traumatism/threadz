@@ -7,12 +7,12 @@ P = ParamSpec("P")
 
 
 def threadify(func: Callable[P, Any]) -> Callable[P, None]:
-    """ Decorator to make a function run in a thread. """
+    """Decorator to add threading to a function."""
 
     @functools.wraps(func)
-    def wrapper(*args: P.args, **kwargs: P.kwargs) -> None:
-        return threading.Thread(
-            target=functools.partial(func, *args, **kwargs)
+    def wrapper(*args: P.args, **kwargs: P.kwargs):
+        threading.Thread(
+            None, functools.partial(func, *args, **kwargs)
         ).start()
 
     return wrapper

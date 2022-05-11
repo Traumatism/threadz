@@ -1,7 +1,13 @@
 from typing import (
-    ParamSpec, TypeVar, List, Tuple,
-    Callable, Any,
-    Optional, Dict, Union
+    ParamSpec,
+    TypeVar,
+    List,
+    Tuple,
+    Callable,
+    Any,
+    Optional,
+    Dict,
+    Union,
 )
 
 from .threadify import threadify
@@ -12,13 +18,9 @@ P = ParamSpec("P")
 
 def gather(
     tasks: List[Tuple[Callable[P, R], Tuple[Any, Any], Dict[str, Any]]],
-    concurrency: Optional[int] = None
+    concurrency: Optional[int] = None,
 ) -> Dict[int, Union[R, Exception]]:
-    """
-    Run a list of tasks with concurrency and return the results.
-
-    The return value is a dictionary mapping task index to the results.
-    """
+    """Run a list of tasks in parallel and return the results."""
 
     running = 0
     results: Dict[int, Union[R, Exception]] = {}

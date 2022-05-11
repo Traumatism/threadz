@@ -1,9 +1,6 @@
 import contextlib
 
-from typing import (
-    TypeVar, List, Tuple,
-    Callable, Dict, Any, Optional
-)
+from typing import TypeVar, List, Tuple, Callable, Dict, Any, Optional
 
 from .threadify import threadify
 
@@ -11,16 +8,17 @@ R = TypeVar("R")
 
 
 class ThisExceptionDoesNotExist(Exception):
-    """ This exception does not exist. """
+    """This exception does not exist."""
+
     pass
 
 
 def run(
     tasks: List[Tuple[Callable, Tuple[Any, Any], Dict[str, Any]]],
     concurrency: Optional[int] = None,
-    raise_exc: bool = False
+    raise_exc: bool = False,
 ) -> None:
-    """ Run a list of tasks with concurrency. """
+    """Run a list of tasks in parallel."""
     running = 0
 
     def _run_task(func, args, kwargs):
